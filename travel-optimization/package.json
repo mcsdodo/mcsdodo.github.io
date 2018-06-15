@@ -1,0 +1,14 @@
+{
+  "name": "leaflet-demo",
+  "version": "1.0.0",
+  "description": "Simplistic demo web to demostrate route matching API.\r To view live example please navigate to https://sygic.github.io/analytics-route-matching-demo/?key= [YOUR_API_KEY]",
+  "main": "index.js",
+  "scripts": {
+    "dev": "lite-server"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lite-server": "^2.3.0"
+  }
+}
