@@ -3,7 +3,7 @@ Lockr.prefix = "sygic";
 var markers = L.layerGroup();
 var matchedRouteLayer = L.layerGroup();
 var segmentsLayer = L.layerGroup();
-var allLayers = [markers, matchedRouteLayer, segmentsLayer];
+var allLayers = [markers, segmentsLayer];
 var map = L.map("map");
 
 L.control.layers(null, {
@@ -14,11 +14,35 @@ L.control.layers(null, {
   collapsed: false
 }).addTo(map);
 
+let splitters = {"tolls":"", "roadclassdetailed":"", "roadclass":"", "number":""}
+let colors = [
+  "#009fff", // blue for no speeding (0%)
+  "#fdff00", // yellow for 10% speeding
+  "#ff7400", // orange for 20% speeding
+  "#f00", // red for 30% speeding
+  "#000" // black for more
+];
+
+for (const splitter in splitters) {
+  if (splitters.hasOwnProperty(splitter)) {
+    const checked = splitter == "tolls" || splitter == "number";
+      map.addCheckBox(splitter, (checked) => {
+          if (checked) {
+              splitters[splitter]=1;
+          } else {
+              delete splitters[splitter];
+          }
+      }, checked);
+      if (!checked)
+        delete splitters[splitter];
+  }
+}
+
 var apiKey = getApiKey();
 let usedInput;
 
 Data.get().then(examples => {
-  usedInput = examples["ew-1"];
+  usedInput = examples["ew-7"];
 
   var sygicTileLayer = L.TileLayer.sygic(apiKey);
   L.layerGroup([sygicTileLayer]).addTo(map);
@@ -47,9 +71,18 @@ Data.get().then(examples => {
   }
 
   function compute(input) {
+    input.splitters = null;
+    for (const splitter in splitters) {
+        if (splitters.hasOwnProperty(splitter)) {
+            input.splitters = input.splitters || [];
+            input.splitters.push(splitter);
+        }
+    }
+
     input.include_estimated_segments = true;
     $.ajax({
-      url: "https://analytics.api.sygic.com/v1/api/speeding?key=" + apiKey,
+      url: "https://directions-testing.api.sygic.com/v1/api/speeding?key=" + apiKey,
+      // url: "http://localhost:7001/v1/api/speeding?key=" + apiKey,
       method: "POST",
       dataType: "json",
       contentType: "application/json; charset=UTF-8",
@@ -59,8 +92,18 @@ Data.get().then(examples => {
 
       if (response.speeding_segments)
         response.speeding_segments.forEach(function (segment, index) {
-          let segmentPolyline = createPolyline(segment.route, "gray");
+          let colorIndex = Math.round(index % 4);
+          let segmentPolyline = createPolyline(segment.route, colors[colorIndex > 4 ? 4 : colorIndex]);
+          let originalColor = segmentPolyline.options.color;
           segmentPolyline.addTo(segmentsLayer);
+          segmentPolyline.on('click', function(e){
+            L.popup({ minWidth: 300, closeButton: false, className: 'xx', autoPanPaddingTopLeft: [0,100] })
+                .setLatLng(e.latlng)
+                .setContent(`<p>${segment.road_class} - ${segment.road_class_detailed} - ${segment.road_number}</p>`).openOn(map);
+          })
+
+          segmentPolyline.on('mouseover', e => e.target.setStyle({color: 'black'}));
+          segmentPolyline.on('mouseout', e => e.target.setStyle({color: originalColor}));
         });
       matchedRoute.addTo(matchedRouteLayer);
 

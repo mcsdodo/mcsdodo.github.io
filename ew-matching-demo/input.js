@@ -1,6 +1,6 @@
 var Data = (function() {
   var data;
-  var files = [1,2,3,7];
+  var files = [7,1,2,3];
   var fileNames = files.map(n => n+".csv");
   return {
     get: async function() {

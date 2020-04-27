@@ -20,6 +20,29 @@ L.Map.prototype.addDropdownFromObject = function(obj, callback) {
       map.addControl(new dropdown());
 }
 
+L.Map.prototype.addCheckBox = function(title, onChange, checked = true){
+  var customInput = L.Control.extend({
+      options: {
+          position: 'topright'
+      },
+      onAdd: function() {
+          var label = L.DomUtil.create('label', 'leaflet-bar leaflet-control leaflet-control-custom transparent_white_container cursor-pointer');
+          label.innerHTML = title;
+          var checkbox = L.DomUtil.create('input', 'input', label);
+          checkbox.type="checkbox";
+          checkbox.checked = checked;
+          $(checkbox).on('change', (evt) => {
+              onChange(evt.target.checked)
+          });
+          L.DomEvent.disableClickPropagation(label);
+          return label;
+      }
+  });
+  let control = new customInput;
+  this.addControl(control);
+  return control;
+}
+
 L.Map.prototype.addButton = function (value, callback) {
     let button = L.Control.extend({
       options: {
@@ -64,7 +87,7 @@ L.Map.prototype.addButton = function (value, callback) {
   function createPolyline(line, color) {
     let polyline = L.Polyline.fromEncoded(line, {
       color: color,
-      weight: 5,
+      weight: 9,
       smoothFactor: 1
     });
     return polyline;
