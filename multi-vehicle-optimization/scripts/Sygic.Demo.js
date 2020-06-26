@@ -129,6 +129,7 @@
 
     // get result of optimization
     function getResults(url) {
+        let retryAfter = 6000;
         $.ajax({
             type: "GET",
             url: url,
@@ -136,10 +137,11 @@
             contentType: "application/json; charset=UTF-8",
         }).done(function (data, textStatus, xhr) {
             // check state of optimization process 
+            retryAfter = (xhr.getResponseHeader("Retry-After") || 1) * 1000;
             if (isWaitingForResults(data.state)) {
                 setTimeout(function () {
                     getResults(url);
-                }, 1000);
+                }, retryAfter);
             } else {
                 displayOptimizationResults(data);
             }
