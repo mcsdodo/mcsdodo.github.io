@@ -289,7 +289,9 @@
         const marker = new L.marker(coordinates, {
             icon: L.BeautifyIcon.icon(options)
         });
-        marker.bindPopup("Vehicle: " + vehicle_id + " <br>Sequence: " + activity.sequence + "<br>Coordinates: " + coordinates.join(",") + "<br>Timestamp: " + activity.timestamp);
+        marker.bindPopup("Vehicle: " + vehicle_id + " <br>Sequence: " + activity.sequence + 
+        "<br>Id: " + activity.location_id + 
+        "<br>Coordinates: " + coordinates.join(",") + "<br>Timestamp: " + activity.timestamp);
 
         return marker;
     }
