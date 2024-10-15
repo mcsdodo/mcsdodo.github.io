@@ -14,7 +14,7 @@ L.control.layers(null, {
   collapsed: false
 }).addTo(map);
 
-let splitters = {"tolls":"", "roadclassdetailed":"", "roadclass":"", "number":""}
+let splitters = {"roadclassdetailed":"", "roadclass":"", "roadnumber":""}
 let colors = [
   "#009fff", // blue for no speeding (0%)
   "#fdff00", // yellow for 10% speeding
@@ -25,7 +25,7 @@ let colors = [
 
 for (const splitter in splitters) {
   if (splitters.hasOwnProperty(splitter)) {
-    const checked = splitter == "tolls" || splitter == "number";
+    const checked = splitter == "tolls" || splitter == "roadnumber";
       map.addCheckBox(splitter, (checked) => {
           if (checked) {
               splitters[splitter]=1;
@@ -71,18 +71,21 @@ Data.get().then(examples => {
   }
 
   function compute(input) {
-    input.splitters = null;
+    var tmpSplitters = [];
+    input.splitting = "";
     for (const splitter in splitters) {
         if (splitters.hasOwnProperty(splitter)) {
-            input.splitters = input.splitters || [];
-            input.splitters.push(splitter);
+          tmpSplitters.push(splitter);
         }
+    }
+    if (tmpSplitters.length > 0) {
+      input.splitting = tmpSplitters.join("|");
     }
 
     input.include_estimated_segments = true;
     $.ajax({
-      url: "https://directions-testing.api.sygic.com/v1/api/speeding?key=" + apiKey,
-      // url: "http://localhost:7001/v1/api/speeding?key=" + apiKey,
+      // url: "https://directions-testing.api.sygic.com/v1/api/speeding?key=" + apiKey,
+      url: "http://localhost:10150/v1/api/matchingroadinfo?key=" + apiKey,
       method: "POST",
       dataType: "json",
       contentType: "application/json; charset=UTF-8",
@@ -90,8 +93,8 @@ Data.get().then(examples => {
     }).done(function (response) {
       let matchedRoute = createPolyline(response.route, "red");
 
-      if (response.speeding_segments)
-        response.speeding_segments.forEach(function (segment, index) {
+      if (response.segments)
+        response.segments.forEach(function (segment, index) {
           let colorIndex = Math.round(index % 4);
           let segmentPolyline = createPolyline(segment.route, colors[colorIndex > 4 ? 4 : colorIndex]);
           let originalColor = segmentPolyline.options.color;
@@ -99,7 +102,7 @@ Data.get().then(examples => {
           segmentPolyline.on('click', function(e){
             L.popup({ minWidth: 300, closeButton: false, className: 'xx', autoPanPaddingTopLeft: [0,100] })
                 .setLatLng(e.latlng)
-                .setContent(`<p>${segment.road_class} - ${segment.road_class_detailed} - ${segment.road_number}</p>`).openOn(map);
+                .setContent(`<p>${segment.road_number}</p>`).openOn(map);
           })
 
           segmentPolyline.on('mouseover', e => e.target.setStyle({color: 'black'}));
