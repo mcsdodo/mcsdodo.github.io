@@ -1,0 +1,53 @@
+{
+  "route": "}olwHws}QZq@Ez@sCf@?\\?^Ml@uAbCShBk@bAx@b@\\pANfA@jAe@bDs@xCeCpLo@nFqA`I?ZKn@O`A}CvTiDtZs@|G[rC]vC_@xByBpSiBhUqBpSkGjm@{@nIuDn^aBxPWpDQvBW~DA`@c@`Jm@tSoDzrAyCvgAy@jV_AhPCX}@dOu@zKInAcBdYIjAWhE}E|w@q@vKoApSALkI`sACXEt@g@nHa@vBc@p@a@^QBS@u@SiAM[K?HiCnRWhBIl@G`@S|Ag@tDWnBCVIf@_@rCGb@YxBGd@Kr@o@|Ee@hDW~BmAzI[zBe@hDGd@sBfO_A`H}LuDbGkd@cGjd@AP~LbD~@aHrBgOFe@d@iDZ{BlA{IV_Cd@iDn@}EJs@Fe@XyBFc@^sCHg@BWVoBf@uDR}AFa@Hm@ViBr@cFD_@Fc@XqBD[LiAHi@DYHu@Z}BXsBD]T{AVy@n@}@`@Yr@MdBTXF|Cv@^Hb@bBBfBUzAc@Du@Hm@[i@q@_@aBCy@B{BDq@ZgFFcAjG{cAVeE@OfAkQH_Bn@aK|Euw@ZsEj@iJ~@kO|@aOhAqQV{Dn@oLp@wRxCugAzDgxA~@eXBa@HgBBWBa@p@iJDc@PeB~@gJrAwKl@kDlAkGnAoFlCmJdD}Kt@wCl@mC^sBj@mDt@cGn@kIXcHLsRAeLPgLV_HjAuOFeCp@kGnBoQJeAh@_EhBwLlCqO|C{N`Pgp@tLwf@H]pHwZhByHj@cCj^yyA`EqP|K{d@jEeSvCyOhBwKdAuG`DyUpM_iABULiAjAiKb@uDnN{mAtA}LV_CDW?GxAcM`@eDVyBHu@PuARcBBIJcAdBcMpBuL@If@eCpBaJ|@gDXaAxDgN`AiBjDuI`AeCrJ}SFMl@mArBcEvAwCfA{Ar@i@x@KhA`@p@~@VfAFf@BpAKhAWbAi@x@YRWJUBs@Ey@_@gBsAyA_Ao@a@i@Yy@c@w@[qB{@iDgAoEw@kCOK?[JWAqBC{@@_FXYAsCf@gBb@MD[JOFeA\\kFbCQJWNMHeFfDwCxBg@b@uEvDeC|B]XqAfAOLKHkIxG_@^UPaCzBc@^{BjB]XQN[VaAx@[XaJ`IcAz@gFjE[V_BrAqA~@qAn@sCh@oBDgBGkBYOEg@Oo@S{Aw@kDqByCqAqCi@WCwC?mBTkCv@eI~EIFuChBe@ZiFdDgBhAUL{@f@sC~AuBbAMDwAn@gAf@e@RiBv@eInCm@N{Cv@e@Lq@R_@J{Ab@yKvCa@JUHk@LoGfBgD|@i@NgEfAsEpA}Cz@QD{A^q@PoCt@cHjB}Ab@uCx@iBb@kBj@yDfAwA^qBh@wDbA[Fs@LsAVcBZgBZYFcEt@iALc@?SDO@]DqARoCVqAFgCNS@gJTaHCwGU{G[kGWgAEeESaEOQAiBIaFKqKDS@kAB[B_EZ}Cd@mAPmKtBqCv@eJ`DkCjAoAj@UJeEvAqDt@iBTsCNkB?sESoDm@mEuAi@UiDiB}UuOo@a@gGeEECeC_B[SOK{@k@sOoK_Ao@a@WkCmBiA{@wB_BgFcEuAkAa@]eEqDc@a@MMuAsAcA_AwBqB_A}@}GeGuAkAIIMKq@k@aA{@y@q@cByAaBwAa@]cA_AmC{CgA}AuCiFoAuCaCqHkAgFO{@w@iFSaB",
+  "segments": [
+    {
+      "route": "}olwHws}QZq@Ez@iCPIT?\\?^Ml@uAbCShB_A|@RDx@b@\\pANfA@jAe@bDs@xCeCpLo@nFqA`I?Z",
+      "distance": 959,
+      "speed_profile": 33.06818,
+      "road_number": ""
+    },
+    {
+      "route": "w`mwH_s{QKn@O`A}CvTiDtZs@|G[rC]vC_@xByBpSiBhUqBpSkGjm@{@nIuDn^aBxPWpDQvBW~DA`@c@`Jm@tSoDzrAyCvgAy@jV_AhPCX}@dOu@zKInAcBdYIjAWhE}E|w@q@vKoApSALkI`sACXEt@g@nH",
+      "distance": 8493,
+      "speed_profile": 116.12117,
+      "road_number": "A10"
+    },
+    {
+      "route": "a`pwHyjdQa@vBc@p@a@^QBS@u@SiAM[K?HaBbMg@jDWhBIl@G`@S|Ag@tDWnBCVIf@_@rCGb@YxBGd@Kr@o@|Ee@hDW~BmAzI[zBe@hDGd@sBfO_A`HcMsCDa@RuAnFua@_BzLcDnVAP~LjD?G~@aHrBgOFe@d@iDZ{BlA{IV_Cd@iDn@}EJs@Fe@XyBFc@^sCHg@BWVoBf@uDR}AFa@Hm@ViBr@cFD_@Fc@XqBD[LiAHi@DYHu@Z}BXsBD]T{AVy@n@}@`@Yr@MdBTXF|Cv@^Hb@bBBfBUzAc@Du@Hm@[i@q@_@aBCy@B{B",
+      "distance": 5080,
+      "speed_profile": 49.54792,
+      "road_number": ""
+    },
+    {
+      "route": "}}owHqtdQDq@ZgFFcAjG{cAVeE@OfAkQH_Bn@aK|Euw@ZsEj@iJ~@kO|@aOhAqQV{Dn@oLp@wRxCugAzDgxA~@eXBa@HgBBWBa@p@iJDc@PeB~@gJrAwKl@kDlAkGnAoFlCmJdD}Kt@wCl@mC^sBj@mDt@cGn@kIXcHLsRAeLPgLV_HjAuOFeCp@kGnBoQJeAh@_EhBwLlCqO|C{N`Pgp@tLwf@H]pHwZhByHj@cCj^yyA`EqP|K{d@jEeSvCyOhBwKdAuG`DyUpM_iABULiAjAiKb@uDnN{mAtA}LV_CDW?GxAcM`@eDVyBHu@PuARcBBIJcAdBcMpBuL@If@eCpBaJ|@gDXaAxDgN",
+      "distance": 16799,
+      "speed_profile": 112.7965,
+      "road_number": "E40|A10"
+    },
+    {
+      "route": "s`gwHw}pR`AiBjDuI`AeCrJ}SFMl@mArBcEvAwCfA{Ar@i@x@KhA`@p@~@VfAFf@BpAKhAWbAi@x@YRWJUBs@Ey@_@gBsAyA_Ao@a@i@Yy@c@w@[qB{@iDgAoEw@kCOK?[J",
+      "distance": 1868,
+      "speed_profile": 78.768745,
+      "road_number": ""
+    },
+    {
+      "route": "ibgwHkvrRWAqBC{@@_FXYAsCf@gBb@MD[JOFeA\\kFbCQJWNMHeFfDwCxBg@b@uEvDeC|B]XqAfAOLKHkIxG_@^UPaCzBc@^{BjB]XQN[VaAx@[XaJ`IcAz@gFjE[V_BrAqA~@qAn@sCh@oBDgBGkBYOEg@Oo@S{Aw@kDqByCqAqCi@WCwC?mBTkCv@eI~EIFuChBe@ZiFdDgBhAUL{@f@sC~AuBbAMDwAn@gAf@e@RiBv@eInCm@N{Cv@e@Lq@R_@J{Ab@yKvCa@JUHk@LoGfBgD|@i@NgEfAsEpA}Cz@QD{A^q@PoCt@cHjB}Ab@uCx@iBb@kBj@yDfAwA^qBh@wDbA[Fs@LsAVcBZgBZYFcEt@iALc@?SDO@]DqARoCVqAFgCNS@gJTaHCwGU{G[kGWgAEeESaEOQAiBIaFKqKDS@kAB[B_EZ}Cd@mAPmKtBqCv@eJ`DkCjAoAj@UJeEvAqDt@iBTsCNkB?sESoDm@mEuAi@UiDiB}UuOo@a@gGeEECeC_B[SOK{@k@sOoK_Ao@a@WkCmBiA{@wB_B",
+      "distance": 11822,
+      "speed_profile": 90.66054,
+      "road_number": "E403|N31"
+    },
+    {
+      "route": "o{zwHy_oRgFcEuAkAa@]eEqDc@a@MMuAsAcA_AwBqB_A}@}GeGuAkAIIMKq@k@aA{@y@q@cByAaBwAa@]cA_AmC{CgA}AuCiFoAuCaCqHkAgFO{@w@iFSaB",
+      "distance": 1859,
+      "speed_profile": 86.40462,
+      "road_number": "E34|A11"
+    }
+  ],
+  "status": "OK",
+  "distance": {
+    "value": 46842,
+    "text": "46.84 km"
+  },
+  "copyright": "© 2024 Sygic a.s."
+}

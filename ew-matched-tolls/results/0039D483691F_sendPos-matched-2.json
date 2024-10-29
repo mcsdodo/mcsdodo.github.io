@@ -1,0 +1,23 @@
+{
+  "route": "c~ytHm}iReFw\\mCwPsCyQWeBO_Aa@cCs@yDu@qEeD}Pu@uDqCwLeA{DKc@wEoPWu@qEcNq@uBuEoNEQiCeI}AwE_i@aaBwFyOyEcLaAqBi\\ur@}CiGiPu\\uGkOs@cBw@sB]y@CIKWsMu_@y@eC}B{GcAwCg@cFAgBZaCBwBC{@Go@_AwCyBgGSKK@i@`@AL",
+  "segments": [
+    {
+      "route": "c~ytHm}iReFw\\mCwPsCyQWeBO_Aa@cCs@yDu@qEeD}Pu@uDqCwLeA{DKc@wEoPWu@qEcNq@uBuEoNEQiCeI}AwE_i@aaBwFyOyEcLaAqBi\\ur@}CiGiPu\\uGkOs@cBw@sB]y@CIKWsMu_@y@eC}B{GcAwC",
+      "distance": 6828,
+      "speed_profile": 109.8606,
+      "road_number": "E17|A14"
+    },
+    {
+      "route": "}q`uHqryRg@cFAgBZaCBwBC{@Go@_AwCyBgGSKK@i@`@AL",
+      "distance": 477,
+      "speed_profile": 21.779999,
+      "road_number": ""
+    }
+  ],
+  "status": "OK",
+  "distance": {
+    "value": 7305,
+    "text": "7.31 km"
+  },
+  "copyright": "© 2024 Sygic a.s."
+}
