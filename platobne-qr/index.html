@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Platobné QR z XML</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: one narrow column. Drop area, then summary strip, then a grid of payment cards, then the email block. */
+:root {
+  --bg: #f4f6f5;
+  --surface: #ffffff;
+  --ink: #17201d;
+  --muted: #5b6763;
+  --line: #d9e0dd;
+  --accent: #0d6b57;
+  --accent-soft: #e2f1ec;
+  --warn: #9a5b00;
+  --warn-soft: #fff3dc;
+  --bad: #b3261e;
+  --bad-soft: #fde8e6;
+  --good: #1e7a3c;
+  --font-body: "IBM Plex Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, "Courier New", monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111715;
+    --surface: #18201d;
+    --ink: #e6ece9;
+    --muted: #9aa8a3;
+    --line: #2c3834;
+    --accent: #4cc3a5;
+    --accent-soft: #173229;
+    --warn: #f0b45a;
+    --warn-soft: #33270f;
+    --bad: #f28b82;
+    --bad-soft: #3a1c1a;
+    --good: #6fd08f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111715;
+  --surface: #18201d;
+  --ink: #e6ece9;
+  --muted: #9aa8a3;
+  --line: #2c3834;
+  --accent: #4cc3a5;
+  --accent-soft: #173229;
+  --warn: #f0b45a;
+  --warn-soft: #33270f;
+  --bad: #f28b82;
+  --bad-soft: #3a1c1a;
+  --good: #6fd08f;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+}
+main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+  display: grid;
+  gap: 24px;
+}
+h1, h2 { text-wrap: balance; margin: 0; line-height: 1.2; }
+h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.125rem; font-weight: 600; }
+p { margin: 0; }
+.lede { color: var(--muted); max-width: 65ch; }
+header { display: grid; gap: 8px; }
+
+/* How it works + privacy */
+.about { display: grid; grid-template-columns: 3fr 2fr; gap: 16px; }
+.steps {
+  margin: 0;
+  padding: 16px 20px 16px 40px;
+  display: grid;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 0.9375rem;
+}
+.steps li::marker { color: var(--accent); font-weight: 700; }
+.privacy {
+  display: grid;
+  gap: 8px;
+  padding: 16px 20px;
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  border-radius: 12px;
+  font-size: 0.9375rem;
+}
+.privacy p:last-child { color: var(--muted); font-size: 0.875rem; }
+@media (max-width: 720px) { .about { grid-template-columns: 1fr; } }
+
+/* Drop area */
+.drop {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 40px 20px;
+  border: 2px dashed var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.drop:hover, .drop.over { border-color: var(--accent); background: var(--accent-soft); }
+.drop:focus-within { outline: 3px solid var(--accent); outline-offset: 2px; }
+.drop.compact { padding: 16px 20px; grid-auto-flow: column; justify-content: center; align-items: center; }
+.drop.compact .drop-hint { display: none; }
+.drop-title { font-weight: 600; font-size: 1.0625rem; }
+.drop-hint { color: var(--muted); font-size: 0.9375rem; }
+.drop input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--surface);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn.ghost { background: transparent; color: var(--accent); }
+.btn:hover { filter: brightness(1.08); }
+.btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* Summary */
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+  align-items: baseline;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.stat { display: grid; gap: 2px; }
+.stat .k { font-size: 0.8125rem; color: var(--muted); }
+.stat .v { font-weight: 600; font-variant-numeric: tabular-nums; }
+.stat .v.big { font-size: 1.375rem; }
+.mono { font-family: var(--font-mono); font-size: 0.9375em; }
+.pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.pill.ok { background: var(--accent-soft); color: var(--good); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.alerts { display: grid; gap: 8px; }
+.alert { padding: 10px 14px; border-radius: 8px; border-left: 4px solid; }
+.alert.bad { background: var(--bad-soft); border-color: var(--bad); }
+.alert.warn { background: var(--warn-soft); border-color: var(--warn); }
+
+/* Payment cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 16px; }
+.card {
+  display: grid;
+  grid-template-columns: 168px 1fr;
+  gap: 16px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.card.has-warn { border-left: 4px solid var(--warn); }
+.qr { width: 168px; height: 168px; background: #ffffff; border-radius: 6px; padding: 4px; }
+.qr img { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+.info { display: grid; gap: 4px; align-content: start; min-width: 0; }
+.amount { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.creditor { font-weight: 600; overflow-wrap: anywhere; }
+.row { color: var(--muted); font-size: 0.9375rem; overflow-wrap: anywhere; }
+.syms { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.875rem; }
+.syms span { font-family: var(--font-mono); }
+.syms b { font-family: var(--font-body); font-weight: 500; color: var(--muted); margin-right: 4px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.actions .btn { padding: 6px 12px; font-size: 0.875rem; }
+.card .alert { grid-column: 1 / -1; font-size: 0.875rem; }
+.num { color: var(--muted); font-size: 0.8125rem; font-variant-numeric: tabular-nums; }
+
+/* Email block */
+.email {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.email-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.status { font-size: 0.9375rem; font-weight: 500; }
+.status.ok { color: var(--good); }
+.status.bad { color: var(--bad); }
+.preview {
+  background: #ffffff;
+  color: #1a1a1a;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  max-height: 520px;
+  overflow: auto;
+}
+textarea {
+  width: 100%;
+  min-height: 220px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+textarea:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+details summary { cursor: pointer; color: var(--accent); font-weight: 500; }
+details[open] summary { margin-bottom: 10px; }
+.note { color: var(--muted); font-size: 0.875rem; max-width: 75ch; }
+.hidden { display: none !important; }
+
+@media (max-width: 520px) {
+  main { padding: 20px 16px 48px; }
+  .cards { grid-template-columns: 1fr; }
+  .card { grid-template-columns: 1fr; justify-items: start; }
+  .qr { width: 200px; height: 200px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Platobné QR kódy z príkazu na úhradu</h1>
+    <p class="lede">Z príkazu na úhradu vo formáte SEPA XML (pain.001) pripraví pre každú platbu QR kód a odkaz na zaplatenie. Výsledok skopírujete do e-mailu a príjemca platby len klikne alebo naskenuje.</p>
+  </header>
+
+  <section class="about" aria-label="Ako to funguje">
+    <ol class="steps">
+      <li><b>Vložte súbor XML</b> z účtovného programu, ten istý, ktorý by ste importovali do internet bankingu.</li>
+      <li><b>Skontrolujte platby.</b> Stránka overí počet platieb, kontrolný súčet a IBAN každého príjemcu.</li>
+      <li><b>Skopírujte text do e-mailu.</b> Ku každej platbe je QR kód PAY by square a odkaz payme, ktorý na mobile otvorí vyplnený príkaz v aplikácii banky.</li>
+    </ol>
+    <div class="privacy">
+      <p><b>Údaje zostávajú vo vašom počítači.</b> Súbor sa spracuje len v tomto prehliadači. Nikam sa neodosiela a nikde sa neukladá, ani na tomto webe. Z internetu si stránka načíta len písma a knižnice na kreslenie QR kódov, vaše údaje im neposiela.</p>
+      <p>Údaje o platbe opustia počítač až vtedy, keď niekto otvorí odkaz payme: banková aplikácia alebo stránka payme.sk ich prečíta z odkazu.</p>
+    </div>
+  </section>
+
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept=".xml,text/xml,application/xml">
+    <span class="drop-title" id="drop-title">Pretiahnite sem súbor XML</span>
+    <span class="drop-hint">alebo</span>
+    <span class="btn" id="drop-btn">Vybrať súbor</span>
+  </label>
+
+  <div class="alerts" id="alerts"></div>
+
+  <section class="summary hidden" id="summary" aria-label="Súhrn príkazu"></section>
+
+  <section class="cards" id="cards" aria-label="Platby"></section>
+
+  <section class="email hidden" id="email" aria-labelledby="email-h">
+    <h2 id="email-h">Text do e-mailu</h2>
+    <p class="note">Skopírujte text a vložte ho do nového e-mailu. Príjemca na mobile klikne na odkaz, na počítači naskenuje QR kód mobilom.</p>
+    <div class="email-actions">
+      <button type="button" class="btn" id="copy-rich">Kopírovať e-mail s QR kódmi</button>
+      <button type="button" class="btn ghost" id="copy-text">Kopírovať len text</button>
+      <span class="status" id="copy-status" role="status" aria-live="polite"></span>
+    </div>
+    <div class="preview" id="preview" aria-label="Náhľad e-mailu"></div>
+    <details>
+      <summary>Obyčajný text e-mailu</summary>
+      <textarea id="plain" readonly aria-label="Obyčajný text e-mailu"></textarea>
+    </details>
+    <p class="note">Ak e-mailový program QR kódy nezobrazí, odkazy fungujú aj tak: na počítači otvoria stránku payme.sk s QR kódom. Účet platiteľa odkaz ani QR kód neprenesú, v aplikácii banky ho treba vybrať ručne.</p>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="core.js"></script>
+<script type="module">
+const $ = (id) => document.getElementById(id);
+let bysquare = null;
+try {
+  bysquare = await import("https://cdn.jsdelivr.net/npm/bysquare@4.1.0/pay/+esm");
+} catch (e) {
+  bysquare = null;
+}
+
+const nf = new Intl.NumberFormat("sk-SK", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmt = (cents) => nf.format(cents / 100).replace(/[\u00a0\u202f]/g, " ") + " EUR";
+const ibanFmt = (iban) => iban.replace(/(.{4})/g, "$1 ").trim();
+const dateFmt = (d) => d ? Number(d.slice(6, 8)) + ". " + Number(d.slice(4, 6)) + ". " + d.slice(0, 4) : "";
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function today() {
+  const d = new Date();
+  return String(d.getFullYear()) + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0");
+}
+
+// QR as PNG data URI, so it can go into a copied email too.
+function qrPng(data, scale) {
+  const qr = qrcode(0, "M");
+  qr.addData(data);
+  qr.make();
+  const n = qr.getModuleCount();
+  const margin = 4;
+  const size = (n + margin * 2) * scale;
+  const c = document.createElement("canvas");
+  c.width = size;
+  c.height = size;
+  const g = c.getContext("2d");
+  g.fillStyle = "#ffffff";
+  g.fillRect(0, 0, size, size);
+  g.fillStyle = "#000000";
+  for (let r = 0; r < n; r++) {
+    for (let col = 0; col < n; col++) {
+      if (qr.isDark(r, col)) g.fillRect((col + margin) * scale, (r + margin) * scale, scale, scale);
+    }
+  }
+  return c.toDataURL("image/png");
+}
+
+function qrPayload(p) {
+  if (bysquare) {
+    try {
+      return { kind: "bysquare", data: bysquare.encode(bysquareModel(p, today())) };
+    } catch (e) {
+      p.warnings.push("QR kód PAY by square sa nepodarilo vytvoriť (" + e.message + "). QR kód obsahuje odkaz payme.");
+    }
+  } else {
+    p.warnings.push("Knižnica PAY by square sa nenačítala. QR kód obsahuje odkaz payme, ten načíta fotoaparát mobilu.");
+  }
+  return { kind: "payme", data: p.link };
+}
+
+function symHtml(p) {
+  return [["VS", p.vs], ["SS", p.ss], ["KS", p.ks]]
+    .filter(([, v]) => v)
+    .map(([k, v]) => "<div><b>" + k + "</b><span>" + esc(v) + "</span></div>")
+    .join("");
+}
+
+function emailHtml(result) {
+  const font = "font-family:Arial,Helvetica,sans-serif;";
+  let h = '<div style="' + font + 'font-size:14px;line-height:1.5;color:#1a1a1a">';
+  h += '<table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse">';
+  result.payments.forEach((p, i) => {
+    const sym = [p.vs && "VS " + p.vs, p.ss && "SS " + p.ss, p.ks && "KS " + p.ks].filter(Boolean).join(", ");
+    h += '<tr><td style="padding:12px 16px 12px 0;vertical-align:top;border-top:1px solid #dddddd">';
+    h += '<img src="' + p.qrSmall + '" width="150" height="150" alt="QR platba ' + (i + 1) + '" style="display:block;width:150px;height:150px"></td>';
+    h += '<td style="padding:12px 0;vertical-align:top;border-top:1px solid #dddddd">';
+    h += '<div style="font-size:18px;font-weight:bold">' + (i + 1) + ") " + fmt(p.cents) + "</div>";
+    h += "<div><b>" + esc(p.creditor) + "</b></div>";
+    h += '<div style="font-family:Consolas,monospace">' + ibanFmt(p.iban) + "</div>";
+    if (sym) h += "<div>" + esc(sym) + "</div>";
+    if (p.message) h += "<div>Správa: " + esc(p.message) + "</div>";
+    h += '<div style="margin-top:6px"><a href="' + esc(p.link) + '" style="color:#0d6b57;font-weight:bold">Zaplatiť v aplikácii banky</a></div>';
+    h += '<div style="font-size:11px;color:#666666;word-break:break-all">' + esc(p.link) + "</div>";
+    h += "</td></tr>";
+  });
+  h += "</table></div>";
+  return h;
+}
+
+function setAlerts(list) {
+  $("alerts").innerHTML = list.map(([kind, msg]) => '<div class="alert ' + kind + '">' + esc(msg) + "</div>").join("");
+}
+
+let current = null;
+
+function render(result, fileName) {
+  current = result;
+  const errs = result.errors.map((e) => ["bad", e]);
+  if (!result.payments.length) {
+    setAlerts(errs);
+    $("summary").classList.add("hidden");
+    $("email").classList.add("hidden");
+    $("cards").innerHTML = "";
+    return;
+  }
+  for (const p of result.payments) {
+    const q = qrPayload(p);
+    p.qrKind = q.kind;
+    p.qrBig = qrPng(q.data, 6);
+    p.qrSmall = qrPng(q.data, 3);
+  }
+  const warnCount = result.payments.filter((p) => p.warnings.length).length;
+  setAlerts(errs);
+
+  const payer = result.payers[0] || {};
+  const state = result.errors.length ? ["bad", "Skontrolujte chyby"] : warnCount ? ["warn", "Upozornenia: " + warnCount] : ["ok", "Údaje sedia"];
+  $("summary").innerHTML =
+    '<div class="stat"><span class="k">Súbor</span><span class="v">' + esc(fileName) + "</span></div>" +
+    '<div class="stat"><span class="k">Platiteľ</span><span class="v">' + esc(payer.name || "-") + ' <span class="mono">' + esc(ibanFmt(payer.iban || "")) + "</span></span></div>" +
+    '<div class="stat"><span class="k">Dátum splatnosti</span><span class="v">' + esc(dateFmt(payer.date)) + "</span></div>" +
+    '<div class="stat"><span class="k">Platby</span><span class="v big">' + result.payments.length + "</span></div>" +
+    '<div class="stat"><span class="k">Spolu</span><span class="v big">' + fmt(result.totalCents) + "</span></div>" +
+    '<span class="pill ' + state[0] + '">' + state[1] + "</span>";
+  $("summary").classList.remove("hidden");
+
+  $("cards").innerHTML = result.payments.map((p, i) =>
+    '<article class="card' + (p.warnings.length ? " has-warn" : "") + '">' +
+      '<div class="qr"><img src="' + p.qrBig + '" alt="QR kód ' + (p.qrKind === "bysquare" ? "PAY by square" : "s odkazom payme") + " pre platbu " + (i + 1) + '"></div>' +
+      '<div class="info">' +
+        '<span class="num">Platba ' + (i + 1) + " z " + result.payments.length + "</span>" +
+        '<span class="amount">' + fmt(p.cents) + "</span>" +
+        '<span class="creditor">' + esc(p.creditor) + "</span>" +
+        '<span class="row mono">' + esc(ibanFmt(p.iban)) + (p.bic ? " (" + esc(p.bic) + ")" : "") + "</span>" +
+        '<div class="syms">' + symHtml(p) + "</div>" +
+        (p.message ? '<span class="row">' + esc(p.message) + "</span>" : "") +
+        '<div class="actions">' +
+          '<a class="btn" href="' + esc(p.link) + '" target="_blank" rel="noopener">Otvoriť odkaz</a>' +
+          '<button type="button" class="btn ghost" data-copy="' + i + '">Kopírovať odkaz</button>' +
+        "</div>" +
+      "</div>" +
+      p.warnings.map((w) => '<div class="alert warn">' + esc(w) + "</div>").join("") +
+    "</article>"
+  ).join("");
+
+  $("preview").innerHTML = emailHtml(result);
+  $("plain").value = emailText(result, fmt, ibanFmt);
+  $("copy-status").textContent = "";
+  $("email").classList.remove("hidden");
+  $("drop").classList.add("compact");
+  $("drop-title").textContent = "Načítať iný súbor";
+}
+
+async function handleFile(file) {
+  if (!file) return;
+  try {
+    const buf = await file.arrayBuffer();
+    const head = new TextDecoder("latin1").decode(buf.slice(0, 200));
+    const m = head.match(/encoding=["']([^"']+)["']/i);
+    let dec;
+    try { dec = new TextDecoder(m ? m[1] : "utf-8"); } catch (e) { dec = new TextDecoder("utf-8"); }
+    const doc = new DOMParser().parseFromString(dec.decode(buf), "application/xml");
+    if (doc.getElementsByTagName("parsererror").length) {
+      render({ payers: [], payments: [], totalCents: 0, errors: ["Súbor " + file.name + " nie je platné XML."] }, file.name);
+      return;
+    }
+    render(parsePain001(doc, today()), file.name);
+  } catch (e) {
+    render({ payers: [], payments: [], totalCents: 0, errors: ["Súbor sa nepodarilo načítať: " + e.message] }, file.name);
+  }
+}
+
+$("file").addEventListener("change", (e) => {
+  handleFile(e.target.files[0]);
+  e.target.value = "";
+});
+const drop = $("drop");
+window.addEventListener("dragover", (e) => e.preventDefault());
+window.addEventListener("drop", (e) => e.preventDefault());
+drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
+drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+drop.addEventListener("drop", (e) => {
+  e.preventDefault();
+  drop.classList.remove("over");
+  handleFile(e.dataTransfer.files[0]);
+});
+
+function status(ok, msg) {
+  const s = $("copy-status");
+  s.className = "status " + (ok ? "ok" : "bad");
+  s.textContent = msg;
+}
+
+function copySelection(el) {
+  const sel = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  sel.removeAllRanges();
+  sel.addRange(range);
+  let ok = false;
+  try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+  sel.removeAllRanges();
+  return ok;
+}
+
+$("copy-rich").addEventListener("click", async () => {
+  if (!current) return;
+  const html = $("preview").innerHTML;
+  const text = $("plain").value;
+  try {
+    if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+      await navigator.clipboard.write([new ClipboardItem({
+        "text/html": new Blob([html], { type: "text/html" }),
+        "text/plain": new Blob([text], { type: "text/plain" }),
+      })]);
+      status(true, "Skopírované aj s QR kódmi. Vložte do e-mailu (Ctrl+V).");
+      return;
+    }
+  } catch (e) { /* try the next method */ }
+  if (copySelection($("preview"))) {
+    status(true, "Skopírované aj s QR kódmi. Vložte do e-mailu (Ctrl+V).");
+    return;
+  }
+  status(false, "Prehliadač kopírovanie nepovolil. Označte náhľad nižšie myšou a stlačte Ctrl+C.");
+});
+
+$("copy-text").addEventListener("click", async () => {
+  if (!current) return;
+  try {
+    await navigator.clipboard.writeText($("plain").value);
+    status(true, "Text skopírovaný. Vložte do e-mailu (Ctrl+V).");
+    return;
+  } catch (e) { /* try the next method */ }
+  const ta = $("plain");
+  ta.closest("details").open = true;
+  ta.select();
+  let ok = false;
+  try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+  status(ok, ok ? "Text skopírovaný. Vložte do e-mailu (Ctrl+V)." : "Prehliadač kopírovanie nepovolil. Text je označený, stlačte Ctrl+C.");
+});
+
+$("cards").addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-copy]");
+  if (!b || !current) return;
+  const link = current.payments[Number(b.dataset.copy)].link;
+  try {
+    await navigator.clipboard.writeText(link);
+    b.textContent = "Skopírované";
+  } catch (err) {
+    b.textContent = "Nepodarilo sa";
+  }
+  setTimeout(() => { b.textContent = "Kopírovať odkaz"; }, 2000);
+});
+</script>
+</body>
+</html>
